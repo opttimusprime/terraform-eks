@@ -1,59 +1,31 @@
 module "eks" {
-
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.0"
-
-  #############################################
-  # Cluster
-  #############################################
 
   cluster_name    = "${var.project}-${var.environment}-eks"
   cluster_version = "1.30"
 
-  #############################################
-  # Endpoint Access
-  #############################################
-
   cluster_endpoint_public_access = true
 
-  #############################################
-  # VPC Configuration
-  #############################################
-
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
-
-  #############################################
-  # Managed Node Group
-  #############################################
+  vpc_id     = data.terraform_remote_state.vpc.outputs.vpc_id
+  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
 
   eks_managed_node_groups = {
-
     blue = {
-
       min_size     = 2
       max_size     = 3
       desired_size = 2
 
       instance_types = ["c7i-flex.large"]
-
-      capacity_type = "ON_DEMAND"
+      capacity_type  = "ON_DEMAND"
     }
   }
 
-  #############################################
-  # Cluster Addons
-  #############################################
-
   cluster_addons = {
-    coredns = {}
+    coredns    = {}
     kube-proxy = {}
-    vpc-cni = {}
+    vpc-cni    = {}
   }
-
-  #############################################
-  # Tags
-  #############################################
 
   tags = local.common_tags
 }
