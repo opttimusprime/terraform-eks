@@ -86,7 +86,7 @@ resource "aws_instance" "k8s_workstation" {
 set -e
 
 dnf update -y
-dnf install -y git unzip wget curl tar yum-utils docker
+dnf install -y git unzip wget tar yum-utils docker
 
 systemctl enable docker
 systemctl start docker

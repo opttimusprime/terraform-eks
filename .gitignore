@@ -5,8 +5,8 @@
 crash.log
 
 # Terraform plan files
-tfplan
-destroyplan
+*tfplan
+*destroyplan
 *.tfplan
 
 # Variable files
