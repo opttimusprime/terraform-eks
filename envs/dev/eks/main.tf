@@ -6,10 +6,36 @@ module "eks" {
   cluster_version = "1.30"
 
   cluster_endpoint_public_access  = true
-  cluster_endpoint_private_access = false
+  cluster_endpoint_private_access = true
 
   vpc_id     = data.terraform_remote_state.vpc.outputs.vpc_id
   subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
+
+  #############################################
+  # EKS Access Entry / RBAC Automation
+  #############################################
+
+  enable_cluster_creator_admin_permissions = true
+
+  access_entries = {
+    k8s_workstation = {
+      principal_arn = data.terraform_remote_state.k8s_workstation.outputs.k8s_workstation_role_arn
+
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+  }
+
+  #############################################
+  # Managed Node Group
+  #############################################
 
   eks_managed_node_groups = {
     blue = {
@@ -21,6 +47,10 @@ module "eks" {
       capacity_type  = "ON_DEMAND"
     }
   }
+
+  #############################################
+  # Cluster Addons
+  #############################################
 
   cluster_addons = {
     coredns    = {}
