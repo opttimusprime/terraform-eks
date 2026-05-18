@@ -10,7 +10,6 @@ crash.log
 *.tfplan
 
 # Variable files
-*.tfvars
 *.tfvars.json
 
 # Sensitive/override files
