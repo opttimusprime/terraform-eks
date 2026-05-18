@@ -5,7 +5,8 @@ module "eks" {
   cluster_name    = "${var.project}-${var.environment}-eks"
   cluster_version = "1.30"
 
-  cluster_endpoint_public_access = true
+  cluster_endpoint_public_access  = true
+  cluster_endpoint_private_access = false
 
   vpc_id     = data.terraform_remote_state.vpc.outputs.vpc_id
   subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
