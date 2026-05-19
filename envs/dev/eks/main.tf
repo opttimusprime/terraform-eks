@@ -33,7 +33,7 @@ module "eks" {
     }
 
     console_user = {
-      principal_arn = "arn:aws:iam::942548380129:user/gantaranivr"
+      principal_arn = "arn:aws:iam::942548380129:user/gantaranvir"
 
       policy_associations = {
         admin = {
