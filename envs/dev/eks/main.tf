@@ -31,7 +31,6 @@ module "eks" {
         }
       }
     }
-
   }
 
   #############################################
@@ -46,7 +45,7 @@ module "eks" {
 
       instance_types = ["c7i-flex.large"]
       capacity_type  = "ON_DEMAND"
-      #capacity_type  = "SPOT"
+      # capacity_type = "SPOT"
     }
   }
 
@@ -60,29 +59,40 @@ module "eks" {
     vpc-cni    = {}
   }
 
-  tags = local.common_tags
+  #############################################
+  # Security Group Rules
+  #############################################
 
+  cluster_security_group_additional_rules = {
+    ingress_k8s_workstation_https = {
+      description = "Allow k8s workstation to access EKS API"
+      protocol    = "tcp"
+      from_port   = 443
+      to_port     = 443
+      type        = "ingress"
+      cidr_blocks = ["10.10.0.0/16"]
+    }
+
+    ingress_nodes_ephemeral = {
+      description                = "Allow nodes to communicate with cluster API"
+      protocol                   = "tcp"
+      from_port                  = 1025
+      to_port                    = 65535
+      type                       = "ingress"
+      source_node_security_group = true
+    }
+  }
 
   node_security_group_additional_rules = {
-  ingress_self_all = {
-    description = "Node to node all traffic"
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    type        = "ingress"
-    self        = true
+    ingress_self_all = {
+      description = "Allow node to node communication"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
+    }
   }
 
-}
-
-cluster_security_group_additional_rules = {
-  ingress_nodes_ephemeral = {
-    description                = "Node groups to cluster API"
-    protocol                   = "tcp"
-    from_port                  = 1025
-    to_port                    = 65535
-    type                       = "ingress"
-    source_node_security_group = true
-  }
-}
+  tags = local.common_tags
 }
