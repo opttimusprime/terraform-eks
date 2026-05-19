@@ -58,7 +58,8 @@ module "eks" {
       desired_size = 2
 
       instance_types = ["c7i-flex.large"]
-      capacity_type  = "ON_DEMAND"
+      #capacity_type  = "ON_DEMAND"
+      capacity_type  = "SPOT"
     }
   }
 
