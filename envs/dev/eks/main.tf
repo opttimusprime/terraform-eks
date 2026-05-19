@@ -32,19 +32,6 @@ module "eks" {
       }
     }
 
-    console_user = {
-      principal_arn = "arn:aws:iam::942548380129:user/gantaranvir"
-
-      policy_associations = {
-        admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-
-          access_scope = {
-            type = "cluster"
-          }
-        }
-      }
-    }
   }
 
   #############################################
