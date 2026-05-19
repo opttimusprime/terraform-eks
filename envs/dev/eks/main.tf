@@ -73,15 +73,6 @@ module "eks" {
     self        = true
   }
 
-  egress_all = {
-    description      = "Allow all outbound traffic"
-    protocol         = "-1"
-    from_port        = 0
-    to_port          = 0
-    type             = "egress"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
 }
 
 cluster_security_group_additional_rules = {
