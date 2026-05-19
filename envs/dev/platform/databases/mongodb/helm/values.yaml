@@ -15,7 +15,7 @@ arbiter:
 persistence:
   enabled: true
   storageClass: gp3
-  size: 20Gi
+  size: 10Gi
 
 service:
   type: ClusterIP

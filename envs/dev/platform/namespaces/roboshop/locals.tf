@@ -4,6 +4,4 @@ locals {
     Environment = var.environment
     ManagedBy   = "terraform"
   }
-
-  namespace = "roboshop"
 }
