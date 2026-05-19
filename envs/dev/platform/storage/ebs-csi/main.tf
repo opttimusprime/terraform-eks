@@ -13,7 +13,7 @@ module "ebs_csi_irsa_role" {
     }
   }
 
-  tags = locals.common_tags
+  tags = local.common_tags
 }
 
 resource "aws_eks_addon" "ebs_csi" {
@@ -24,26 +24,5 @@ resource "aws_eks_addon" "ebs_csi" {
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"
 
-  tags = locals.common_tags
-}
-
-resource "kubernetes_storage_class" "gp3" {
-  metadata {
-    name = "gp3"
-    annotations = {
-      "storageclass.kubernetes.io/is-default-class" = "true"
-    }
-  }
-
-  storage_provisioner    = "ebs.csi.aws.com"
-  reclaim_policy         = "Retain"
-  volume_binding_mode    = "WaitForFirstConsumer"
-  allow_volume_expansion = true
-
-  parameters = {
-    type      = "gp3"
-    encrypted = "true"
-  }
-
-  depends_on = [aws_eks_addon.ebs_csi]
+  tags = local.common_tags
 }
