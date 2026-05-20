@@ -15,7 +15,7 @@ module "eks" {
   # EKS Access Entry / RBAC Automation
   #############################################
 
-  enable_cluster_creator_admin_permissions = true
+  enable_cluster_creator_admin_permissions = false
 
   access_entries = {
     k8s_workstation = {
@@ -45,7 +45,6 @@ module "eks" {
 
       instance_types = ["c7i-flex.large"]
       capacity_type  = "ON_DEMAND"
-      # capacity_type = "SPOT"
     }
   }
 
@@ -85,7 +84,7 @@ module "eks" {
 
   node_security_group_additional_rules = {
     ingress_self_all = {
-      description = "Allow node to node communication"
+      description = "Allow node-to-node communication"
       protocol    = "-1"
       from_port   = 0
       to_port     = 0
