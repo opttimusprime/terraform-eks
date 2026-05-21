@@ -2,7 +2,7 @@ replicaCount: 3
 
 replicaSetName: rs0
 
-namespace: {{ .Values.namespace }}
+namespace: mongodb
 
 image:
   repository: mongo
