@@ -23,7 +23,7 @@ data "terraform_remote_state" "namespace" {
 
   config = {
     bucket = "roboshop-tf-state"
-    key    = "dev/platform/namespaces/roboshop/terraform.tfstate"
+    key    = "dev/platform/namespaces/mongodb/terraform.tfstate"
     region = "us-east-1"
   }
 }
