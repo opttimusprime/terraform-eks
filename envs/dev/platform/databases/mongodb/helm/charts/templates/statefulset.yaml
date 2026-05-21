@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: mongodb
+  namespace: {{ .Values.namespace }}
+
+spec:
+  serviceName: mongodb-headless
+
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: mongodb
+
+  template:
+    metadata:
+      labels:
+        app: mongodb
+
+    spec:
+      serviceAccountName: mongodb-sa
+
+      containers:
+        - name: mongodb
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+
+          ports:
+            - containerPort: 27017
+
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: MONGO_INITDB_ROOT_USERNAME
+
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: MONGO_INITDB_ROOT_PASSWORD
+
+            - name: MONGO_REPLICA_SET_NAME
+              value: "rs0"
+
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+
+            - name: mongodb-init-script
+              mountPath: /docker-entrypoint-initdb.d/mongo-init.js
+              subPath: mongo-init.js
+
+      volumes:
+        - name: mongodb-init-script
+          configMap:
+            name: mongodb-init-script
+
+  volumeClaimTemplates:
+    - metadata:
+        name: mongodb-data
+
+      spec:
+        accessModes:
+          - ReadWriteOnce
+
+        storageClassName: {{ .Values.persistence.storageClass }}
+
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}
