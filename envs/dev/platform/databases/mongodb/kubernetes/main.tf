@@ -8,7 +8,7 @@ resource "helm_release" "mongodb" {
 
   values = [
     file("${path.module}/../helm/values.yaml"),
-    file("${path.module}/../${var.helm_values_file}")
+    
   ]
   timeout = 1200
   wait    = true
