@@ -20,8 +20,18 @@ spec:
         - name: mongodb
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          command:
+            - mongod
+
+          args:
+            - "--bind_ip_all"
+            - "--replSet"
+            - "{{ .Values.replicaSetName }}"
+
           ports:
             - containerPort: {{ .Values.service.port }}
+
           env:
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
@@ -35,18 +45,22 @@ spec:
                   key: MONGO_INITDB_ROOT_PASSWORD
             - name: MONGO_REPLICA_SET_NAME
               value: "{{ .Values.replicaSetName }}"
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+
           volumeMounts:
             - name: mongodb-data
               mountPath: /data/db
             - name: mongodb-init-script
               mountPath: /docker-entrypoint-initdb.d/{{ .Values.initScript.fileName }}
               subPath: {{ .Values.initScript.fileName }}
+
       volumes:
         - name: mongodb-init-script
           configMap:
             name: {{ .Values.initScript.configMapName }}
+
   volumeClaimTemplates:
     - metadata:
         name: mongodb-data
