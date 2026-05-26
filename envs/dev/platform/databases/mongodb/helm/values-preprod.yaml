@@ -1,0 +1,15 @@
+replicaCount: 2
+
+image:
+  pullPolicy: IfNotPresent
+
+persistence:
+  size: 20Gi
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
