@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-replicaset-init
+  labels:
+    app: mongodb
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mongodb-replicaset-init
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "Waiting for MongoDB pods..."
+              sleep 30
+
+              mongosh --host mongodb-0.mongodb-headless.mongodb.svc.cluster.local:27017 <<EOF
+              try {
+                rs.status();
+                print("ReplicaSet already initialized. Exiting...");
+              } catch (e) {
+                print("ReplicaSet not initialized. Initializing now...");
+
+                rs.initiate({
+                  _id: "{{ .Values.replicaSetName }}",
+                  members: [
+                    { _id: 0, host: "mongodb-0.mongodb-headless.mongodb.svc.cluster.local:27017" },
+                    { _id: 1, host: "mongodb-1.mongodb-headless.mongodb.svc.cluster.local:27017" }
+                  ]
+                });
+              }
+              EOF
