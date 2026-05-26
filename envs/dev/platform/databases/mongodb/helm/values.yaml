@@ -1,4 +1,4 @@
-replicaCount: 3
+replicaCount: 2
 
 replicaSetName: rs0
 
@@ -7,7 +7,7 @@ namespace: mongodb
 image:
   repository: mongo
   tag: "7.0"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 service:
   type: ClusterIP
