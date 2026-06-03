@@ -11,10 +11,6 @@ module "eks" {
   vpc_id     = data.terraform_remote_state.vpc.outputs.vpc_id
   subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
 
-  #############################################
-  # EKS Access Entry / RBAC Automation
-  #############################################
-
   enable_cluster_creator_admin_permissions = false
 
   access_entries = {
@@ -31,11 +27,21 @@ module "eks" {
         }
       }
     }
-  }
 
-  #############################################
-  # Managed Node Group
-  #############################################
+    # jenkins = {
+    #   principal_arn = data.terraform_remote_state.jenkins.outputs.jenkins_role_arn
+
+    #   policy_associations = {
+    #     admin = {
+    #       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+    #       access_scope = {
+    #         type = "cluster"
+    #       }
+    #     }
+    #   }
+    # }
+  }
 
   eks_managed_node_groups = {
     blue = {
@@ -48,19 +54,11 @@ module "eks" {
     }
   }
 
-  #############################################
-  # Cluster Addons
-  #############################################
-
   cluster_addons = {
     coredns    = {}
     kube-proxy = {}
     vpc-cni    = {}
   }
-
-  #############################################
-  # Security Group Rules
-  #############################################
 
   cluster_security_group_additional_rules = {
     ingress_k8s_workstation_https = {
