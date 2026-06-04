@@ -22,14 +22,14 @@ data "terraform_remote_state" "k8s_workstation" {
   }
 }
 
-# data "terraform_remote_state" "jenkins" {
+data "terraform_remote_state" "jenkins" {
 
-#   backend = "s3"
+  backend = "s3"
 
-#   config = {
-#     bucket = "opttimusprime-jenkins-tf-state"
-#     key    = "jenkins/dev/terraform.tfstate"
-#     region = "us-east-1"
-#   }
-# }
+  config = {
+    bucket = "opttimusprime-jenkins-tf-state"
+    key    = "jenkins/dev/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
 
