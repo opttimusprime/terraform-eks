@@ -22,9 +22,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
           command:
-            - mongod
+            - docker-entrypoint.sh
 
           args:
+            - mongod
             - "--bind_ip_all"
             - "--replSet"
             - "{{ .Values.replicaSetName }}"
@@ -38,11 +39,13 @@ spec:
                 secretKeyRef:
                   name: mongodb-secret
                   key: MONGO_INITDB_ROOT_USERNAME
+
             - name: MONGO_INITDB_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mongodb-secret
                   key: MONGO_INITDB_ROOT_PASSWORD
+
             - name: MONGO_REPLICA_SET_NAME
               value: "{{ .Values.replicaSetName }}"
 
@@ -52,6 +55,7 @@ spec:
           volumeMounts:
             - name: mongodb-data
               mountPath: /data/db
+
             - name: mongodb-init-script
               mountPath: /docker-entrypoint-initdb.d/{{ .Values.initScript.fileName }}
               subPath: {{ .Values.initScript.fileName }}
