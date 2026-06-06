@@ -29,6 +29,9 @@ spec:
             - "--bind_ip_all"
             - "--replSet"
             - "{{ .Values.replicaSetName }}"
+            - "--auth"
+            - "--keyFile"
+            - "/etc/mongodb-keyfile/keyfile"
 
           ports:
             - containerPort: {{ .Values.service.port }}
@@ -60,10 +63,19 @@ spec:
               mountPath: /docker-entrypoint-initdb.d/{{ .Values.initScript.fileName }}
               subPath: {{ .Values.initScript.fileName }}
 
+            - name: mongodb-keyfile
+              mountPath: /etc/mongodb-keyfile
+              readOnly: true
+
       volumes:
         - name: mongodb-init-script
           configMap:
             name: {{ .Values.initScript.configMapName }}
+
+        - name: mongodb-keyfile
+          secret:
+            secretName: mongodb-keyfile
+            defaultMode: 0400
 
   volumeClaimTemplates:
     - metadata:
