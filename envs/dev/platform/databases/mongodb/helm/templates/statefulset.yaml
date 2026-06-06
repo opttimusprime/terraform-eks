@@ -16,6 +16,24 @@ spec:
         app: mongodb
     spec:
       serviceAccountName: mongodb-sa
+
+      initContainers:
+        - name: fix-keyfile-permissions
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              cp /keyfile-source/keyfile /keyfile/keyfile
+              chmod 400 /keyfile/keyfile
+              chown 999:999 /keyfile/keyfile
+          volumeMounts:
+            - name: mongodb-keyfile-secret
+              mountPath: /keyfile-source
+              readOnly: true
+            - name: mongodb-keyfile
+              mountPath: /keyfile
+
       containers:
         - name: mongodb
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -72,10 +90,13 @@ spec:
           configMap:
             name: {{ .Values.initScript.configMapName }}
 
-        - name: mongodb-keyfile
+        - name: mongodb-keyfile-secret
           secret:
             secretName: mongodb-keyfile
             defaultMode: 0400
+
+        - name: mongodb-keyfile
+          emptyDir: {}
 
   volumeClaimTemplates:
     - metadata:

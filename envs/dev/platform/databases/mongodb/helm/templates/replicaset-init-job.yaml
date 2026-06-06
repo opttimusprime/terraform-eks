@@ -12,14 +12,31 @@ spec:
       containers:
         - name: mongodb-replicaset-init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: MONGO_INITDB_ROOT_USERNAME
+
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: MONGO_INITDB_ROOT_PASSWORD
+
           command:
             - /bin/bash
             - -c
             - |
               echo "Waiting for MongoDB pods..."
-              sleep 30
+              sleep 40
 
-              mongosh --host mongodb-0.mongodb-headless.mongodb.svc.cluster.local:27017 <<EOF
+              mongosh \
+                --host mongodb-0.mongodb-headless.mongodb.svc.cluster.local:27017 \
+                -u "$MONGO_INITDB_ROOT_USERNAME" \
+                -p "$MONGO_INITDB_ROOT_PASSWORD" \
+                --authenticationDatabase admin <<EOF
               try {
                 rs.status();
                 print("ReplicaSet already initialized. Exiting...");
