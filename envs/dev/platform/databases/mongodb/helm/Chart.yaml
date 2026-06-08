@@ -1,6 +1,0 @@
-apiVersion: v2
-name: mongodb
-description: Custom MongoDB Helm Chart for Roboshop
-type: application
-version: 1.0.0
-appVersion: "7.0"
