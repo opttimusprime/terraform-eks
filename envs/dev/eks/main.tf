@@ -9,7 +9,7 @@ module "eks" {
   cluster_endpoint_private_access = true
 
   vpc_id     = data.terraform_remote_state.vpc.outputs.vpc_id
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
+  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnet_ids
 
   enable_cluster_creator_admin_permissions = false
 
@@ -27,20 +27,6 @@ module "eks" {
         }
       }
     }
-
-      # jenkins = {
-      #   principal_arn = data.terraform_remote_state.jenkins.outputs.jenkins_role_arn
-
-      #   policy_associations = {
-      #     admin = {
-      #       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-
-      #       access_scope = {
-      #         type = "cluster"
-      #       }
-      #     }
-      #   }
-      # }
   }
 
   eks_managed_node_groups = {
@@ -49,7 +35,7 @@ module "eks" {
       max_size     = 3
       desired_size = 2
 
-      instance_types = ["c7i-flex.large"]
+      instance_types = ["t3.medium"]
       capacity_type  = "ON_DEMAND"
     }
   }
@@ -61,13 +47,13 @@ module "eks" {
   }
 
   cluster_security_group_additional_rules = {
-    ingress_k8s_workstation_https = {
-      description = "Allow k8s workstation to access EKS API"
+    ingress_vpc_https = {
+      description = "Allow resources inside roboshop VPC to access EKS API"
       protocol    = "tcp"
       from_port   = 443
       to_port     = 443
       type        = "ingress"
-      cidr_blocks = ["10.10.0.0/16"]
+      cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr]
     }
 
     ingress_nodes_ephemeral = {
