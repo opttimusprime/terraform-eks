@@ -81,3 +81,11 @@ resource "helm_release" "external_secrets" {
   wait    = true
   timeout = 600
 }
+
+resource "kubernetes_manifest" "cluster_secret_store" {
+  manifest = yamldecode(file("${path.module}/cluster-secret-store.yaml"))
+
+  depends_on = [
+    helm_release.external_secrets
+  ]
+}
