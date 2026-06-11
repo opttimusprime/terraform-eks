@@ -29,7 +29,7 @@ module "eks" {
     }
 
     jenkins = {
-      principal_arn = data.terraform_remote_state.jenkins.outputs.jenkins_agent_role_arn
+      principal_arn = data.terraform_remote_state.jenkins.outputs.jenkins_role_arn
 
       policy_associations = {
         admin = {
