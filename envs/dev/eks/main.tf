@@ -9,7 +9,7 @@ module "eks" {
   cluster_endpoint_private_access = true
 
   vpc_id     = data.terraform_remote_state.vpc.outputs.vpc_id
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnet
+  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
 
   enable_cluster_creator_admin_permissions = false
 
