@@ -15,3 +15,4 @@ resource "aws_secretsmanager_secret_version" "mongodb" {
     MONGO_REPLICA_SET_KEY      = var.mongodb_replicaset_key
   })
 }
+
