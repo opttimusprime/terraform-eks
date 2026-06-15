@@ -17,7 +17,7 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host = data.terraform_remote_state.eks.outputs.cluster_endpoint
 
     cluster_ca_certificate = base64decode(
