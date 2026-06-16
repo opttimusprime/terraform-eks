@@ -17,3 +17,18 @@ variable "remote_state_bucket" {
   description = "Terraform remote state bucket"
   type        = string
 }
+
+variable "domain_name" {
+  description = "Base domain name"
+  type        = string
+}
+
+variable "acm_certificate_arn" {
+  description = "ACM certificate ARN for HTTPS"
+  type        = string
+}
+
+variable "allowed_ingress_cidr" {
+  description = "Allowed CIDR for Grafana and Prometheus access"
+  type        = string
+}
