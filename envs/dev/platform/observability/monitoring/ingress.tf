@@ -12,7 +12,6 @@ resource "kubernetes_ingress_v1" "monitoring" {
       "alb.ingress.kubernetes.io/ssl-redirect"    = "443"
       "alb.ingress.kubernetes.io/inbound-cidrs"   = var.allowed_ingress_cidr
 
-
       "external-dns.alpha.kubernetes.io/hostname" = "grafana.${var.domain_name},prometheus.${var.domain_name}"
     }
   }

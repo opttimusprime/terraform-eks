@@ -32,3 +32,8 @@ variable "allowed_ingress_cidr" {
   description = "Allowed CIDR for Grafana and Prometheus access"
   type        = string
 }
+
+variable "grafana_admin_password" {
+  type      = string
+  sensitive = true
+}

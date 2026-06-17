@@ -8,7 +8,68 @@ resource "helm_release" "monitoring" {
   create_namespace = false
 
   wait    = true
-  timeout = 600
+  timeout = 900
+
+  values = [
+    yamlencode({
+      prometheus = {
+        prometheusSpec = {
+          retention = "7d"
+
+          storageSpec = {
+            volumeClaimTemplate = {
+              spec = {
+                storageClassName = "gp3"
+                accessModes      = ["ReadWriteOnce"]
+
+                resources = {
+                  requests = {
+                    storage = "10Gi"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      grafana = {
+        enabled       = true
+        adminPassword = var.grafana_admin_password
+
+        persistence = {
+          enabled          = true
+          type             = "pvc"
+          storageClassName = "gp3"
+          accessModes      = ["ReadWriteOnce"]
+          size             = "10Gi"
+        }
+
+        service = {
+          type = "ClusterIP"
+        }
+      }
+
+      alertmanager = {
+        alertmanagerSpec = {
+          storage = {
+            volumeClaimTemplate = {
+              spec = {
+                storageClassName = "gp3"
+                accessModes      = ["ReadWriteOnce"]
+
+                resources = {
+                  requests = {
+                    storage = "5Gi"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+  ]
 
   depends_on = [
     kubernetes_namespace.monitoring
