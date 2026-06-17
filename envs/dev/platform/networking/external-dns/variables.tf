@@ -1,19 +1,33 @@
 variable "region" {
-  default = "us-east-1"
+  type = string
 }
 
 variable "project" {
-  default = "optimusprime"
+  type = string
 }
 
 variable "environment" {
-  default = "dev"
+  type = string
+}
+
+variable "eks_state_bucket" {
+  type = string
+}
+
+variable "eks_state_key" {
+  type = string
 }
 
 variable "domain_name" {
-  default = "optimusprime.uno"
+  type = string
 }
 
 variable "namespace" {
+  type    = string
   default = "external-dns"
+}
+
+variable "external_dns_chart_version" {
+  type    = string
+  default = "1.15.0"
 }
