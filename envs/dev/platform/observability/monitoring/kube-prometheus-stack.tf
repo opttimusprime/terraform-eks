@@ -6,9 +6,8 @@ resource "helm_release" "monitoring" {
   chart      = "kube-prometheus-stack"
 
   create_namespace = false
-
-  wait    = true
-  timeout = 900
+  wait             = true
+  timeout          = 900
 
   values = [
     yamlencode({

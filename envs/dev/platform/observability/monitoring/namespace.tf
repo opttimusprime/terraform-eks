@@ -1,7 +1,6 @@
 resource "kubernetes_namespace" "monitoring" {
   metadata {
-    name = "monitoring"
-
+    name   = "monitoring"
     labels = local.common_tags
   }
 }

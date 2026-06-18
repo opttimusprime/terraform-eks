@@ -8,7 +8,7 @@ resource "kubernetes_ingress_v1" "monitoring" {
       "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
       "alb.ingress.kubernetes.io/target-type"     = "ip"
       "alb.ingress.kubernetes.io/listen-ports"    = jsonencode([{ HTTP = 80 }, { HTTPS = 443 }])
-      "alb.ingress.kubernetes.io/certificate-arn" = data.aws_acm_certificate.wildcard.arn
+      "alb.ingress.kubernetes.io/certificate-arn" = var.acm_certificate_arn
       "alb.ingress.kubernetes.io/ssl-redirect"    = "443"
       "alb.ingress.kubernetes.io/inbound-cidrs"   = var.allowed_ingress_cidr
 

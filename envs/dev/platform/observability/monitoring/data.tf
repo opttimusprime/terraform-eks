@@ -7,9 +7,3 @@ data "terraform_remote_state" "eks" {
     region = var.aws_region
   }
 }
-
-data "aws_acm_certificate" "wildcard" {
-  domain      = "*.optimusprime.uno"
-  statuses    = ["ISSUED"]
-  most_recent = true
-}
