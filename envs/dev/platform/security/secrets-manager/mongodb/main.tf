@@ -1,10 +1,11 @@
 resource "aws_secretsmanager_secret" "mongodb" {
-  name = "${var.project}/${var.environment}/mongodb"
+  name        = "${var.project}/${var.environment}/mongodb"
+  description = "MongoDB secrets"
 
-  tags = local.common_tags
+  tags = merge(local.common_tags, {
+    Component = "mongodb"
+  })
 }
-
-
 
 resource "aws_secretsmanager_secret_version" "mongodb" {
   secret_id = aws_secretsmanager_secret.mongodb.id
@@ -15,4 +16,3 @@ resource "aws_secretsmanager_secret_version" "mongodb" {
     MONGO_REPLICA_SET_KEY      = var.mongodb_replicaset_key
   })
 }
-
