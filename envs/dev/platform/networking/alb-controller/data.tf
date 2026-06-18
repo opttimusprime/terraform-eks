@@ -4,7 +4,7 @@ data "terraform_remote_state" "eks" {
   config = {
     bucket = "roboshop-tf-state"
     key    = "dev/eks/terraform.tfstate"
-    region = "us-east-1"
+    region = var.aws_region
   }
 }
 
@@ -14,4 +14,8 @@ data "aws_eks_cluster" "eks" {
 
 data "aws_eks_cluster_auth" "eks" {
   name = data.terraform_remote_state.eks.outputs.cluster_name
+}
+
+data "aws_iam_openid_connect_provider" "oidc" {
+  url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
 }

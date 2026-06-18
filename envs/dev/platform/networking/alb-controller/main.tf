@@ -2,10 +2,8 @@ resource "aws_iam_policy" "alb_controller" {
   name        = "${var.project}-${var.environment}-alb-controller"
   description = "IAM policy for AWS Load Balancer Controller"
   policy      = file("${path.module}/iam_policy.json")
-}
 
-data "aws_iam_openid_connect_provider" "oidc" {
-  url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
+  tags = local.common_tags
 }
 
 resource "aws_iam_role" "alb_controller" {
@@ -26,13 +24,15 @@ resource "aws_iam_role" "alb_controller" {
 
         Condition = {
           StringEquals = {
-            "${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
             "${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}:aud" = "sts.amazonaws.com"
+            "${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
           }
         }
       }
     ]
   })
+
+  tags = local.common_tags
 }
 
 resource "aws_iam_role_policy_attachment" "alb_controller" {
@@ -48,6 +48,12 @@ resource "kubernetes_service_account" "alb_controller" {
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.alb_controller.arn
     }
+
+    labels = {
+      "app.kubernetes.io/name"       = "aws-load-balancer-controller"
+      "app.kubernetes.io/component"  = "controller"
+      "app.kubernetes.io/managed-by" = "terraform"
+    }
   }
 
   depends_on = [
@@ -56,11 +62,11 @@ resource "kubernetes_service_account" "alb_controller" {
 }
 
 resource "helm_release" "alb_controller" {
-  name      = "aws-load-balancer-controller"
-  namespace = "kube-system"
-
+  name       = "aws-load-balancer-controller"
+  namespace  = "kube-system"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
+  version    = var.alb_controller_chart_version
 
   set {
     name  = "clusterName"
@@ -86,6 +92,9 @@ resource "helm_release" "alb_controller" {
     name  = "serviceAccount.name"
     value = kubernetes_service_account.alb_controller.metadata[0].name
   }
+
+  wait    = true
+  timeout = 600
 
   depends_on = [
     kubernetes_service_account.alb_controller
