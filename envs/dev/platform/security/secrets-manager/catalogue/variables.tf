@@ -11,6 +11,6 @@ variable "environment" {
 }
 
 variable "mongo_url" {
-  type = string
+  type      = string
   sensitive = true
 }

@@ -1,7 +1,10 @@
 resource "aws_secretsmanager_secret" "catalogue" {
-  name = "${var.project}/${var.environment}/catalogue"
+  name        = "${var.project}/${var.environment}/catalogue"
+  description = "Catalogue service secrets"
 
-  tags = local.common_tags
+  tags = merge(local.common_tags, {
+    Component = "catalogue"
+  })
 }
 
 resource "aws_secretsmanager_secret_version" "catalogue" {
