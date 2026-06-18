@@ -1,5 +1,6 @@
 resource "aws_iam_policy" "external_secrets" {
-  name = "${var.project}-${var.environment}-external-secrets"
+  name        = "${var.project}-${var.environment}-external-secrets"
+  description = "IAM policy for External Secrets Operator"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -48,20 +49,25 @@ module "external_secrets_irsa" {
 resource "kubernetes_namespace" "external_secrets" {
   metadata {
     name = local.namespace
+
+    labels = {
+      "app.kubernetes.io/managed-by" = "terraform"
+    }
   }
 }
 
 resource "helm_release" "external_secrets" {
-  depends_on = [
-    module.external_secrets_irsa
-  ]
-
   name       = "external-secrets"
-  namespace  = local.namespace
+  namespace  = kubernetes_namespace.external_secrets.metadata[0].name
 
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
-  version    = "0.10.5"
+  version    = var.external_secrets_chart_version
+
+  set {
+    name  = "installCRDs"
+    value = "true"
+  }
 
   set {
     name  = "serviceAccount.create"
@@ -80,12 +86,9 @@ resource "helm_release" "external_secrets" {
 
   wait    = true
   timeout = 600
-}
-
-resource "kubernetes_manifest" "cluster_secret_store" {
-  manifest = yamldecode(file("${path.module}/cluster-secret-store.yaml"))
 
   depends_on = [
-    helm_release.external_secrets
+    module.external_secrets_irsa,
+    kubernetes_namespace.external_secrets
   ]
 }

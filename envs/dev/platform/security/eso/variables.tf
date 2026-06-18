@@ -17,3 +17,8 @@ variable "eks_state_bucket" {
 variable "eks_state_key" {
   type = string
 }
+
+variable "external_secrets_chart_version" {
+  type    = string
+  default = "0.10.5"
+}
