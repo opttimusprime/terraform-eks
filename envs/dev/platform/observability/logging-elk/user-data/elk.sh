@@ -5,7 +5,7 @@ KIBANA_URL="${kibana_url}"
 
 rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
-cat >/etc/yum.repos.d/elastic.repo <<EOF
+cat >/etc/yum.repos.d/elastic.repo <<'EOF'
 [elastic-8.x]
 name=Elastic repository for 8.x packages
 baseurl=https://artifacts.elastic.co/packages/8.x/yum
@@ -19,7 +19,7 @@ EOF
 dnf update -y
 dnf install -y java-17-amazon-corretto elasticsearch logstash kibana
 
-cat >/etc/elasticsearch/elasticsearch.yml <<EOF
+cat >/etc/elasticsearch/elasticsearch.yml <<'EOF'
 cluster.name: roboshop-elk
 node.name: elk-single-node
 network.host: 0.0.0.0
@@ -33,7 +33,7 @@ xpack.security.http.ssl.enabled: false
 xpack.security.transport.ssl.enabled: false
 EOF
 
-cat >/etc/logstash/conf.d/roboshop.conf <<EOF
+cat >/etc/logstash/conf.d/roboshop.conf <<'EOF'
 input {
   beats {
     port => 5044
@@ -43,7 +43,7 @@ input {
 filter {
   if [kubernetes][namespace] {
     mutate {
-      add_field => { "k8s_namespace" => "%{[kubernetes][namespace]}" }
+      add_field => { "k8s_namespace" => "%%{[kubernetes][namespace]}" }
     }
   }
 }
@@ -51,7 +51,7 @@ filter {
 output {
   elasticsearch {
     hosts => ["http://127.0.0.1:9200"]
-    index => "roboshop-logs-%{+YYYY.MM.dd}"
+    index => "roboshop-logs-%%{+YYYY.MM.dd}"
   }
 
   stdout {
