@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-KIBANA_URL="${kibana_url}"
+KIBANA_URL="$${kibana_url}"
 
 rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
@@ -63,7 +63,7 @@ EOF
 cat >/etc/kibana/kibana.yml <<EOF
 server.port: 5601
 server.host: "0.0.0.0"
-server.publicBaseUrl: "${KIBANA_URL}"
+server.publicBaseUrl: "$${KIBANA_URL}"
 
 elasticsearch.hosts: ["http://127.0.0.1:9200"]
 EOF
