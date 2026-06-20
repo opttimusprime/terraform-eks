@@ -3,7 +3,7 @@ data "terraform_remote_state" "vpc" {
 
   config = {
     bucket = var.remote_state_bucket
-    key    = "dev/vpc/terraform.tfstate"
+    key    = "dev/bootstrap/vpc/terraform.tfstate"
     region = var.aws_region
   }
 }
