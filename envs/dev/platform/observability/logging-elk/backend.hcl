@@ -1,5 +1,5 @@
 bucket         = "roboshop-tf-state"
-key            = "dev/platform/observability/logging/terraform.tfstate"
+key            = "dev/platform/observability/logging-elk/terraform.tfstate"
 region         = "us-east-1"
 dynamodb_table = "roboshop-tf-lock"
 encrypt        = true
