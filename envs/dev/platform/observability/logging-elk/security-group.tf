@@ -16,7 +16,7 @@ resource "aws_security_group" "elk" {
     from_port   = 5044
     to_port     = 5044
     protocol    = "tcp"
-    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
+    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr]
   }
 
   ingress {
@@ -28,14 +28,15 @@ resource "aws_security_group" "elk" {
   }
 
   ingress {
-    description = "Elasticsearch local/VPC only"
+    description = "Elasticsearch from VPC only"
     from_port   = 9200
     to_port     = 9200
     protocol    = "tcp"
-    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
+    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr]
   }
 
   egress {
+    description = "Allow all outbound"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -69,6 +70,7 @@ resource "aws_security_group" "kibana_alb" {
   }
 
   egress {
+    description = "Allow all outbound"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
