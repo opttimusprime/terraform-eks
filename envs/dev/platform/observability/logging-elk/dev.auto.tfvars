@@ -7,7 +7,7 @@ domain_name         = "optimusprime.uno"
 acm_certificate_arn = "arn:aws:acm:us-east-1:942548380129:certificate/04035cfa-147e-46be-aca6-93361d8a3c0b"
 
 key_name      = "roboshop-dev-keypair"
-instance_type = "c7i-flex.large"
+instance_type = "m7i-flex.large"
 
 allowed_ssh_cidr    = "0.0.0.0/0"
 allowed_kibana_cidr = "0.0.0.0/0"
