@@ -1,6 +1,7 @@
+
 resource "helm_release" "external_dns" {
-  name       = "external-dns"
-  namespace  = kubernetes_namespace.external_dns.metadata[0].name
+  name      = "external-dns"
+  namespace = kubernetes_namespace.external_dns.metadata[0].name
 
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
@@ -14,13 +15,22 @@ resource "helm_release" "external_dns" {
         name = "aws"
       }
 
-      policy   = "sync"
+      sources = [
+        "ingress"
+      ]
+
+      policy   = "upsert-only"
       registry = "txt"
 
       txtOwnerId = data.aws_eks_cluster.this.name
 
       domainFilters = [
         var.domain_name
+      ]
+
+      extraArgs = [
+        "--aws-zone-type=public",
+        "--zone-id-filter=${data.aws_route53_zone.this.zone_id}"
       ]
 
       serviceAccount = {
