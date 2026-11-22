@@ -10,8 +10,8 @@ data "terraform_remote_state" "vpc" {
   backend = "s3"
 
   config = {
-    bucket = "roboshop-tf-state"
-    key    = "dev/bootstrap/vpc/terraform.tfstate"
+    bucket = "roboshop-tf-state-optimusprime"
+    key    = "roboshop/dev/bootstrap/vpc/terraform.tfstate"
     region = "us-east-1"
   }
 }

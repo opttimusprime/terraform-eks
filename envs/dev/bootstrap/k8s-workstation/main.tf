@@ -1,3 +1,4 @@
+
 #############################################
 # IAM Role for K8s Workstation
 #############################################
@@ -21,14 +22,24 @@ resource "aws_iam_role" "k8s_workstation_role" {
   tags = local.common_tags
 }
 
+#############################################
+# Attach AdministratorAccess Policy
+#############################################
+
 resource "aws_iam_role_policy_attachment" "k8s_workstation_admin" {
   role       = aws_iam_role.k8s_workstation_role.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
+#############################################
+# IAM Instance Profile
+#############################################
+
 resource "aws_iam_instance_profile" "k8s_workstation_profile" {
   name = "${var.project}-${var.environment}-k8s-workstation-profile"
   role = aws_iam_role.k8s_workstation_role.name
+
+  tags = local.common_tags
 }
 
 #############################################
@@ -37,7 +48,7 @@ resource "aws_iam_instance_profile" "k8s_workstation_profile" {
 
 resource "aws_security_group" "k8s_workstation_sg" {
   name        = "${var.project}-${var.environment}-k8s-workstation-sg"
-  description = "Security group for k8s workstation"
+  description = "Security group for K8s workstation"
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
   ingress {
@@ -49,7 +60,7 @@ resource "aws_security_group" "k8s_workstation_sg" {
   }
 
   egress {
-    description = "Allow all outbound traffic"
+    description = "Allow outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -60,7 +71,6 @@ resource "aws_security_group" "k8s_workstation_sg" {
     Name = "${var.project}-${var.environment}-k8s-workstation-sg"
   })
 }
-
 
 #############################################
 # EC2 K8s Workstation
@@ -75,54 +85,126 @@ resource "aws_instance" "k8s_workstation" {
   iam_instance_profile        = aws_iam_instance_profile.k8s_workstation_profile.name
   associate_public_ip_address = true
 
+  ###########################################
+  # Root EBS Volume
+  ###########################################
+
   root_block_device {
     volume_size = 30
     volume_type = "gp3"
     encrypted   = true
   }
 
+  ###########################################
+  # User Data - Install DevOps Tools
+  ###########################################
+
   user_data = <<-EOF
 #!/bin/bash
-set -e
+set -euxo pipefail
+
+# Log installation output
+exec > >(tee /var/log/user-data.log) 2>&1
+
+#############################################
+# 1. Update OS and install dependencies
+#############################################
 
 dnf update -y
-dnf install -y git unzip wget tar yum-utils docker
+dnf install -y git unzip wget tar curl docker
 
-systemctl enable docker
-systemctl start docker
+#############################################
+# 2. Configure Docker
+#############################################
+
+systemctl enable --now docker
 usermod -aG docker ec2-user
 
-# AWS CLI v2
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+#############################################
+# 3. Install or update AWS CLI v2
+#############################################
+
 cd /tmp
-unzip awscliv2.zip
-./aws/install
 
-# Terraform
-dnf install -y dnf-plugins-core
-yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-dnf install -y terraform
+if ! command -v aws >/dev/null 2>&1; then
+  curl -fSL --retry 3 \
+    "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" \
+    -o awscliv2.zip
 
-# kubectl
-curl -LO "https://s3.us-west-2.amazonaws.com/amazon-eks/1.30.0/2024-05-12/bin/linux/amd64/kubectl"
-chmod +x kubectl
-mv kubectl /usr/local/bin/kubectl
+  unzip -oq awscliv2.zip
+  ./aws/install
+else
+  aws --version
+fi
 
-# Helm
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+#############################################
+# 4. Install Terraform 1.10.1
+#############################################
 
-# eksctl
-curl --silent --location "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
-mv /tmp/eksctl /usr/local/bin
+curl -fSL --retry 3 \
+  "https://releases.hashicorp.com/terraform/1.10.1/terraform_1.10.1_linux_amd64.zip" \
+  -o terraform.zip
 
-# Final verification
+unzip -oq terraform.zip terraform
+install -m 0755 terraform /usr/local/bin/terraform
+
+#############################################
+# 5. Install kubectl 1.35.0
+#############################################
+
+KUBECTL_VERSION="1.35.0"
+
+curl -fSL --retry 3 \
+  "https://dl.k8s.io/release/v$KUBECTL_VERSION/bin/linux/amd64/kubectl" \
+  -o kubectl
+
+install -m 0755 kubectl /usr/local/bin/kubectl
+
+#############################################
+# 6. Install Helm 3
+#############################################
+
+curl -fSL --retry 3 \
+  "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3" \
+  -o get_helm.sh
+
+chmod 700 get_helm.sh
+DESIRED_VERSION="v3.19.0" ./get_helm.sh
+
+#############################################
+# 7. Install eksctl
+#############################################
+
+curl -fSL --retry 3 \
+  "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz" \
+  -o eksctl.tar.gz
+
+tar -xzf eksctl.tar.gz -C /tmp eksctl
+install -m 0755 /tmp/eksctl /usr/local/bin/eksctl
+
+#############################################
+# 8. Verify installed tools
+#############################################
+
+echo "========== TOOL VERSIONS =========="
+
 git --version
-terraform version
-aws --version
-kubectl version --client
-helm version
-eksctl version
 docker --version
+aws --version
+terraform version
+kubectl version --client
+helm version --short
+eksctl version
+
+#############################################
+# 9. Verify Docker service
+#############################################
+
+systemctl is-active docker
+
+echo "==================================="
+echo "K8s Workstation setup completed"
+echo "==================================="
 EOF
 
   tags = merge(local.common_tags, {
