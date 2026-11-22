@@ -3,9 +3,9 @@ module "eks" {
   version = "~> 20.0"
 
   cluster_name    = "${var.project}-${var.environment}-eks"
-  cluster_version = "1.30"
+  cluster_version = "1.35"
 
-  cluster_endpoint_public_access  = true
+  cluster_endpoint_public_access  = false
   cluster_endpoint_private_access = true
 
   vpc_id     = data.terraform_remote_state.vpc.outputs.vpc_id
@@ -28,19 +28,19 @@ module "eks" {
       }
     }
 
-    jenkins = {
-      principal_arn = data.terraform_remote_state.jenkins.outputs.jenkins_role_arn
+    # jenkins = {
+    #   principal_arn = data.terraform_remote_state.jenkins.outputs.jenkins_role_arn
 
-      policy_associations = {
-        admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+    #   policy_associations = {
+    #     admin = {
+    #       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 
-          access_scope = {
-            type = "cluster"
-          }
-        }
-      }
-    }
+    #       access_scope = {
+    #         type = "cluster"
+    #       }
+    #     }
+    #   }
+    # }
   }
 
   eks_managed_node_groups = {

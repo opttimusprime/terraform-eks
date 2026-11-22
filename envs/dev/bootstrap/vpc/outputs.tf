@@ -21,3 +21,11 @@ output "private_route_table_ids" {
 output "public_route_table_ids" {
   value = module.vpc.public_route_table_ids
 }
+
+#############################################
+# Laptop Public IP
+#############################################
+
+output "my_public_ip" {
+  value = "${trimspace(data.http.my_public_ip.response_body)}/32"
+}

@@ -6,6 +6,5 @@ project     = "roboshop"
 environment = "dev"
 
 
-key_name                  = "roboshop-dev-keypair"
-my_ip                     = "0.0.0.0/0"
+key_name                  = "roboshop-dev-bastion-keypair"
 workstation_instance_type = "c7i-flex.large"
