@@ -114,7 +114,7 @@ exec > >(tee /var/log/user-data.log) 2>&1
 #############################################
 
 dnf update -y
-dnf install -y git unzip wget tar curl docker
+dnf install -y git unzip wget tar docker
 
 #############################################
 # 2. Configure Docker

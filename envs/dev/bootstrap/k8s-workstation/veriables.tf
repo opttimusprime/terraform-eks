@@ -18,11 +18,6 @@ variable "key_name" {
   description = "AWS EC2 key pair name for SSH access"
 }
 
-variable "my_public_ip" {
-  type        = string
-  description = "Your laptop public IP address with /32"
-}
-
 variable "workstation_instance_type" {
   type        = string
   description = "EC2 instance type for k8s workstation"
