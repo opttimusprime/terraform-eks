@@ -56,7 +56,10 @@ resource "aws_security_group" "k8s_workstation_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.my_ip]
+    cidr_blocks = [
+      data.terraform_remote_state.vpc.outputs.my_public_ip
+    ]
+
   }
 
   egress {
