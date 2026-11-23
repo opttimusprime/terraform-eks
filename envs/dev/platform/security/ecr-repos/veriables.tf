@@ -23,6 +23,12 @@ variable "repositories" {
     "user",
     "payment",
     "shipping",
-    "dispatch"
+    "dispatch",
+    "mongodb",
+    "redis",
+    "mysql",
+    "rabbitmq"
   ]
+
+
 }
