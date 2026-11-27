@@ -1,0 +1,8 @@
+aws_region           = "us-east-1"
+project              = "roboshop"
+environment          = "dev"
+cluster_name         = "roboshop-dev-eks"
+s3_bucket_name       = "roboshop-tf-state-optimusprime"
+s3_prefix            = "artifacts/shipping/db"
+namespace            = "mysql"
+service_account_name = "shipping-db-init-sa"
